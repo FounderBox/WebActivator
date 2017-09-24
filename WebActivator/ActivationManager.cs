@@ -18,7 +18,8 @@ namespace WebActivatorEx
     {
         private static bool _hasInited;
         private static List<Assembly> _assemblies;
-        private static Func<string, bool> _fileFilter = a => true;
+        private static Func<string, bool> _fileFilter = (a => true);
+
 
         // For unit test purpose
         public static void Reset()
@@ -67,6 +68,21 @@ namespace WebActivatorEx
 
                 _hasInited = true;
             }
+        }
+
+        public static void RunPreStartMethods(bool designerMode = false)
+        {
+            RunActivationMethods<PreApplicationStartMethodAttribute>(designerMode);
+        }
+
+        public static void RunPostStartMethods()
+        {
+            RunActivationMethods<PostApplicationStartMethodAttribute>();
+        }
+
+        public static void RunShutdownMethods()
+        {
+            RunActivationMethods<ApplicationShutdownMethodAttribute>();
         }
 
         private static void DetermineWhatFilesAndAssembliesToScan()
@@ -148,22 +164,6 @@ namespace WebActivatorEx
                 return BuildManager.CodeAssemblies.OfType<Assembly>();
             }
         }
-
-        public static void RunPreStartMethods(bool designerMode = false)
-        {
-            RunActivationMethods<PreApplicationStartMethodAttribute>(designerMode);
-        }
-
-        public static void RunPostStartMethods()
-        {
-            RunActivationMethods<PostApplicationStartMethodAttribute>();
-        }
-
-        public static void RunShutdownMethods()
-        {
-            RunActivationMethods<ApplicationShutdownMethodAttribute>();
-        }
-
         // Call the relevant activation method from all assemblies
         private static void RunActivationMethods<T>(bool designerMode = false) where T : BaseActivationMethodAttribute
         {
